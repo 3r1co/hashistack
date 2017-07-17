@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+  nomad:
+    build: ./nomad
+    image: nomad
+    privileged: true
+    ports:
+    - 4646:4646
+    - 4646:4646/udp
+    - 4647:4647
+    - 4647:4647/udp
+    - 4648:4648
+    - 4648:4648/udp
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /tmp:/tmp #See: https://github.com/hashicorp/nomad/issues/1080
+    - ./nomad/config:/config
+    environment:
+    - NOMAD_ADDR=http://nomad:4646
+    command:
+    - agent 
+    - -dev
+    - -bind=nomad 
+    - -config=/config/consul.hcl
+  consul:
+    build: ./consul
+    image: consul
+    privileged: true
+    ports:
+    - 8500:8500
+    command:
+    - agent
+    - -dev
+    - -client=0.0.0.0 #See: https://github.com/gliderlabs/docker-consul/issues/100
+    - -data-dir=/consul
+  hashi-ui:
+    image: jippi/hashi-ui
+    depends_on:
+    - nomad
+    - consul
+    ports:
+    - 3000:3000
+    environment:
+    - NOMAD_ENABLE=1
+    - NOMAD_ADDR=http://nomad:4646
+    - CONSUL_ENABLE=1
+    - CONSUL_ADDR=http://consul:8500

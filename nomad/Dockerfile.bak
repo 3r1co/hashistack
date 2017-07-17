@@ -1,0 +1,15 @@
+FROM ubuntu:17.04
+
+RUN apt-get update && \  
+	apt-get install -y ca-certificates
+
+
+COPY nomad /usr/local/bin/nomad
+
+RUN mkdir /nomad
+WORKDIR "/nomad"
+
+VOLUME ["/nomad"]
+
+ENTRYPOINT ["nomad"]
+CMD ["-v"]
