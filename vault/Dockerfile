@@ -10,7 +10,6 @@ RUN wget http://releases.hashicorp.com/vault/0.7.3/vault_0.7.3_linux_amd64.zip &
 	chmod +x /usr/local/bin/vault && \
 	rm -rf vault_0.7.3_linux_amd64.zip
 
-#ADD vault /usr/local/bin/vault
 RUN mkdir /vault
 
 WORKDIR "/vault"
