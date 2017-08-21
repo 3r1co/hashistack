@@ -29,11 +29,14 @@ services:
     privileged: true
     ports:
     - 8500:8500
+    volumes:
+    - ./consul/data:/consul
     command:
     - agent
     - -dev
     - -client=0.0.0.0 #See: https://github.com/gliderlabs/docker-consul/issues/100
     - -data-dir=/consul
+    - -ui
   hashi-ui:
     image: jippi/hashi-ui
     depends_on:
@@ -46,3 +49,20 @@ services:
     - NOMAD_ADDR=http://nomad:4646
     - CONSUL_ENABLE=1
     - CONSUL_ADDR=http://consul:8500
+  vault:
+    build: ./vault
+    image: vault
+    ports:
+    - 8200:8200
+    volumes:
+    - ./vault/config:/config
+    command:
+    - server
+    - -dev
+    - -config=/config/config.hcl
+  vault-ui:
+    image: djenriquez/vault-ui
+    ports:
+    - 8000:8000
+    environment:
+    - VAULT_URL_DEFAULT=http://vault:8200
